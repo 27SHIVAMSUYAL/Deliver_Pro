@@ -62,7 +62,7 @@
     width: 15%;
     background-color: #0056b3;
     display: flex;
-   justify-content: space-around;
+   justify-content: start;
    font-family: "Lora", serif;
    padding-top: 2%;
    padding-bottom: 2%;
@@ -77,10 +77,18 @@
 }
 
 .start-location {
-    margin: 10%;
+    margin-top: 10%;
+    padding-left: 4%;
     display: flex;
+    flex-direction: column;
+    height: 20%;
+   
 }
 .end-location {
-    margin: 10%;
+    margin-top: 10%;
+    padding-left: 4%;
     display: flex;
+    flex-direction: column;
+    height: 20%;
+   
 }

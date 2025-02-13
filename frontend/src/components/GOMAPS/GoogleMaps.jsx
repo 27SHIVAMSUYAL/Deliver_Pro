@@ -4,19 +4,21 @@ import {
   ControlPosition,
   MapControl,
   AdvancedMarker,
-  Map
+  Map, useDirections,DirectionsRenderer
 
 } from "@vis.gl/react-google-maps";
 import "./GoogleMaps.css";
 import points from "./data/points";    // parcel points imported 
 
 import PlaceAutocomplete from "./mapComponents/PlaceAutocomplete";          // auto complete component imported 
+import { use } from "react";
 
-const GoogleMaps = ({ location }) => {
+const GoogleMaps = ({ location , setStartLocation ,setEndLocation }) => {
 
 
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [tripStartLocation, setTripStartLocation] = useState(null);
+  const [tripEndLocation, setTripEndLocation] = useState(null);
 
   const [markerPosition, setMarkerPosition] = useState({
     lat: location?.latitude || 19.0760,    // default location if no location selected initially ie mumbai
@@ -40,6 +42,24 @@ const GoogleMaps = ({ location }) => {
   }, [selectedPlace]);
   /////////////////////////////////////////
 
+  
+
+  useEffect(()=>{
+    if(tripEndLocation){
+      setEndLocation(tripEndLocation);
+    
+    }
+    if(tripStartLocation){
+      setStartLocation(tripStartLocation);
+    }
+    
+  },[tripStartLocation, tripEndLocation]);
+
+  
+ 
+  
+  
+  
 
   return (
     <div className="maps-main-container">
@@ -55,14 +75,15 @@ const GoogleMaps = ({ location }) => {
         <Markers points={points} />
 
         {/*  */}
-
+    \
       </Map>
 
 
       {/* controlling position of search bar */}
       <MapControl position={ControlPosition.TOP}>
         <div className="autocomplete-control">
-          <PlaceAutocomplete setSelectedPlace={setSelectedPlace} tripStartLocation={tripStartLocation}setTripStartLocation={setTripStartLocation}/>
+          <PlaceAutocomplete selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} tripStartLocation={tripStartLocation} setTripStartLocation={setTripStartLocation} tripEndLocation={tripEndLocation} setTripEndLocation={setTripEndLocation} />
+         
         </div>
       </MapControl>
 

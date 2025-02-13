@@ -1,27 +1,24 @@
 import React from 'react'
 import './GOMAPS.css'
-import { useState, useEffect } from 'react';
+import { useState, useEffect ,useRef} from 'react';
 import {
-  APIProvider,
-  ControlPosition,
-  MapControl,
-  AdvancedMarker,
-  Map,
-  useMap,
-  useMapsLibrary,
+  APIProvider
+  , useMap,
+  useMapsLibrary , useDirections, DirectionsRenderer
 } from "@vis.gl/react-google-maps";
 
 import GoogleMaps from './GoogleMaps';
-import PlaceAutocomplete from './mapComponents/PlaceAutocomplete';
-// import GoogleMapsComponent from './GoogleMapsComponent';
 
 
 
 const GOMAPS = () => {
+
+
   const [selectedPlace, setSelectedPlace] = useState(null);
 
   const [startLocation, setStartLocation] = useState(null);
   const [endLocation, setEndLocation] = useState(null);
+
 
   useEffect(() => {
     if (selectedPlace && selectedPlace.geometry?.location) {
@@ -67,6 +64,70 @@ const GOMAPS = () => {
     console.log(error);
   }
   ////////////////////////////////////////////////////////////////////////////
+  const map = useMap();
+  const routesLibrary = useMapsLibrary("routes");
+  const [directionsService, setDirectionsService] = useState(null);
+  const [directionsRenderer, setDirectionsRenderer] = useState(null);
+
+
+useEffect(() => {
+  if (!map ) {
+    console.warn("Google Maps routes library is not ready yet.");
+    return;
+  }
+
+  // Ensure the library is available before setting up services
+  if (!directionsService) {
+    setDirectionsService(new google.maps.DirectionsService());
+  }
+
+  if (!directionsRenderer) {
+    setDirectionsRenderer(new google.maps.DirectionsRenderer({ map }));
+  }
+}, [map, routesLibrary]);
+
+
+
+  const handleNavigation = () => {
+
+    if (!startLocation || !endLocation) {
+      alert("Please set both Start and End locations!");
+      return;
+    }
+
+    if (!directionsService || !directionsRenderer) {
+
+      console.error("directionService and Renderer not fond");
+      alert("Google Maps is still initializing. Please wait a moment.");
+      return;
+    }
+
+    const request = {
+      origin: {
+        lat: startLocation.geometry.location.lat(),
+        lng: startLocation.geometry.location.lng(),
+      },
+      destination: {
+        lat: endLocation.geometry.location.lat(),
+        lng: endLocation.geometry.location.lng(),
+      },
+      travelMode: google.maps.TravelMode.DRIVING
+    };
+
+    directionsService?.route(request, (result, status) => {
+      if (status === "OK") {
+        console.log(result);
+        
+      } else {
+        alert("Could not calculate directions. Please check locations.");
+      }
+    }).then((result) => {
+      directionsRenderer?.setDirections(result);
+    });
+
+
+  }
+
 
 
   return (
@@ -86,23 +147,44 @@ const GOMAPS = () => {
       </div>
 
       <div className="maps-div">
-        <APIProvider apiKey={"AIzaSyA4JlMN-FfV70T_GZ_7iFX_YMzOvoG2FVU"}>
+        <APIProvider apiKey={"AIzaSyA4JlMN-FfV70T_GZ_7iFX_YMzOvoG2FVU"}  >
           <div className="map-sidebar">
 
-            
+            {/*  */}
             <div className="start-location">
-              <h2>Start Location</h2><button>🔄</button>
-            </div>
-            <div className="end-location">
-              <h2>End Location</h2><button>🔄</button>
+              <div style={{ display: 'flex', alignItems: 'baseline' }}>
+                <h1>Start Location</h1><button style={{ fontSize: 25 }} onClick={() => {
+                  setStartLocation(null);
+                }}>🔄</button>
+              </div>
+              <div>
+                <p style={{ fontSize: 11 }}>{startLocation ? <>lat = {startLocation.geometry.location.lat()} <br />
+                  lng = {startLocation.geometry.location.lng()}</> : ""}</p>
+              </div>
             </div>
 
+            {/*  */}
+
+            <div className="end-location">
+              <div style={{ display: 'flex', alignItems: 'baseline' }}>
+                <h1>End Location</h1><button style={{ fontSize: 25 }} onClick={() => {
+                  setEndLocation(null);
+                }}>🔄</button>
+              </div>
+              <div>
+                <p style={{ fontSize: 11 }}>{endLocation ? <>lat = {endLocation.geometry.location.lat()} <br />
+                  lng = {endLocation.geometry.location.lng()}</> : ""}</p>
+              </div>
+            </div>
+
+            <button onClick={handleNavigation}>start navigation </button>
+            {/*  */}
 
           </div>
 
           <div className="actual-map">
-            <GoogleMaps location={location} />
-            
+            <GoogleMaps location={location} setStartLocation={setStartLocation} setEndLocation={setEndLocation} />
+
           </div>
         </APIProvider>
       </div>
