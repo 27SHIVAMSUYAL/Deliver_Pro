@@ -4,7 +4,7 @@ import {
   ControlPosition,
   MapControl,
   AdvancedMarker,
-  Map, useDirections,DirectionsRenderer
+  Map
 
 } from "@vis.gl/react-google-maps";
 import "./GoogleMaps.css";

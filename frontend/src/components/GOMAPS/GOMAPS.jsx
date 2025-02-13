@@ -4,7 +4,7 @@ import { useState, useEffect ,useRef} from 'react';
 import {
   APIProvider
   , useMap,
-  useMapsLibrary , useDirections, DirectionsRenderer
+  useMapsLibrary 
 } from "@vis.gl/react-google-maps";
 
 import GoogleMaps from './GoogleMaps';
