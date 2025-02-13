@@ -12,7 +12,7 @@ import GoogleMaps from './GoogleMaps';
 
 
 const GOMAPS = () => {
-
+const GoogleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   const [selectedPlace, setSelectedPlace] = useState(null);
 
@@ -144,7 +144,7 @@ const GOMAPS = () => {
       </div>
 
       <div className="maps-div">
-        <APIProvider apiKey={"AIzaSyA4JlMN-FfV70T_GZ_7iFX_YMzOvoG2FVU"}  >
+        <APIProvider apiKey={GoogleMapsApiKey }  >
           <div className="map-sidebar">
 
             {/*  */}
