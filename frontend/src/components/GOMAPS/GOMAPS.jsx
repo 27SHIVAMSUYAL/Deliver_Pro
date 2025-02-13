@@ -1,10 +1,10 @@
 import React from 'react'
 import './GOMAPS.css'
-import { useState, useEffect ,useRef} from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   APIProvider
   , useMap,
-  useMapsLibrary 
+  useMapsLibrary
 } from "@vis.gl/react-google-maps";
 
 import GoogleMaps from './GoogleMaps';
@@ -70,26 +70,23 @@ const GOMAPS = () => {
   const [directionsRenderer, setDirectionsRenderer] = useState(null);
 
 
-useEffect(() => {
-  if (!map ) {
-    console.warn("Google Maps routes library is not ready yet.");
-    return;
-  }
+  useEffect(() => {
+    if (!map) {
+      console.warn("Google Maps routes library is not ready yet.");
+      return;
+    }
 
-  // Ensure the library is available before setting up services
-  if (!directionsService) {
-    setDirectionsService(new google.maps.DirectionsService());
-  }
+    // Ensure the library is available before setting up services
+    if (!directionsService) {
+      setDirectionsService(new google.maps.DirectionsService());
+    }
 
-  if (!directionsRenderer) {
-    setDirectionsRenderer(new google.maps.DirectionsRenderer({ map }));
-  }
-}, [map, routesLibrary]);
-
-
+    if (!directionsRenderer) {
+      setDirectionsRenderer(new google.maps.DirectionsRenderer({ map }));
+    }
+  }, [map, routesLibrary]);
 
   const handleNavigation = () => {
-
     if (!startLocation || !endLocation) {
       alert("Please set both Start and End locations!");
       return;
@@ -117,7 +114,7 @@ useEffect(() => {
     directionsService?.route(request, (result, status) => {
       if (status === "OK") {
         console.log(result);
-        
+
       } else {
         alert("Could not calculate directions. Please check locations.");
       }
@@ -177,13 +174,13 @@ useEffect(() => {
               </div>
             </div>
 
-            <button onClick={handleNavigation}>start navigation </button>
+
             {/*  */}
 
           </div>
 
           <div className="actual-map">
-            <GoogleMaps location={location} setStartLocation={setStartLocation} setEndLocation={setEndLocation} />
+            <GoogleMaps location={location} setStartLocation={setStartLocation} setEndLocation={setEndLocation} startLocation={startLocation} endLocation={endLocation} />
 
           </div>
         </APIProvider>

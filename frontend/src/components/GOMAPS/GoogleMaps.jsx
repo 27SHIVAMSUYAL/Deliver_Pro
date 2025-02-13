@@ -4,16 +4,15 @@ import {
   ControlPosition,
   MapControl,
   AdvancedMarker,
-  Map
+  Map, useMap
 
 } from "@vis.gl/react-google-maps";
 import "./GoogleMaps.css";
 import points from "./data/points";    // parcel points imported 
 
 import PlaceAutocomplete from "./mapComponents/PlaceAutocomplete";          // auto complete component imported 
-import { use } from "react";
 
-const GoogleMaps = ({ location , setStartLocation ,setEndLocation }) => {
+const GoogleMaps = ({ location, setStartLocation, setEndLocation, startLocation, endLocation }) => {
 
 
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -35,32 +34,74 @@ const GoogleMaps = ({ location , setStartLocation ,setEndLocation }) => {
         lng: selectedPlace.geometry.location.lng(),
       });
 
-     
+
       console.log("lat of selected location = ", selectedPlace.geometry.location.lat())
       console.log("lng of selected location = ", selectedPlace.geometry.location.lng())
     }
   }, [selectedPlace]);
   /////////////////////////////////////////
 
-  
 
-  useEffect(()=>{
-    if(tripEndLocation){
+
+  useEffect(() => {
+    if (tripEndLocation) {
       setEndLocation(tripEndLocation);
-    
+
     }
-    if(tripStartLocation){
+    if (tripStartLocation) {
       setStartLocation(tripStartLocation);
     }
-    
-  },[tripStartLocation, tripEndLocation]);
 
-  
- 
-  
-  
-  
+  }, [tripStartLocation, tripEndLocation]);
 
+
+  /////////////////////////////
+  const map = useMap();
+  const [directionsService, setDirectionsService] = useState(null);
+  const [directionsRenderer, setDirectionsRenderer] = useState(null);
+
+  useEffect(() => {
+    if (map && !directionsService && !directionsRenderer) {
+      const service = new google.maps.DirectionsService();
+      const renderer = new google.maps.DirectionsRenderer();
+      renderer.setMap(map);
+
+      setDirectionsService(service);
+      setDirectionsRenderer(renderer);
+    }
+  }, [map]);
+
+  const navigate = () => {
+    if (!startLocation || !endLocation) {
+      alert("Enter Start and End Location");
+      return;
+    }
+    if (directionsService && directionsRenderer) {
+      directionsService.route(
+        {
+          origin: {
+            lat: startLocation.geometry.location.lat(),
+            lng: startLocation.geometry.location.lng(),
+          },
+          destination: {
+            lat: endLocation.geometry.location.lat(),
+            lng: endLocation.geometry.location.lng(),
+          }, // Mumbai
+          travelMode: google.maps.TravelMode.DRIVING,
+        },
+        (result, status) => {
+          if (status === google.maps.DirectionsStatus.OK) {
+            directionsRenderer.setDirections(result);
+          } else {
+            console.error("Error fetching directions:", status);
+          }
+        }
+      );
+    }
+
+  }
+
+  //////////////////////////////
   return (
     <div className="maps-main-container">
 
@@ -75,7 +116,7 @@ const GoogleMaps = ({ location , setStartLocation ,setEndLocation }) => {
         <Markers points={points} />
 
         {/*  */}
-    \
+
       </Map>
 
 
@@ -83,8 +124,12 @@ const GoogleMaps = ({ location , setStartLocation ,setEndLocation }) => {
       <MapControl position={ControlPosition.TOP}>
         <div className="autocomplete-control">
           <PlaceAutocomplete selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} tripStartLocation={tripStartLocation} setTripStartLocation={setTripStartLocation} tripEndLocation={tripEndLocation} setTripEndLocation={setTripEndLocation} />
-         
+
         </div>
+      </MapControl>
+
+      <MapControl position={ControlPosition.BLOCK_END_INLINE_CENTER}>
+        <button onClick={navigate} className="navigation-button">Start Navigation</button>
       </MapControl>
 
       {/*  */}
@@ -103,7 +148,8 @@ const Markers = ({ points }) => {
       {points.map((point, index) => (
         <AdvancedMarker key={index} position={{ lat: point.lat, lng: point.lng }}>
 
-          <div>📍</div>
+          <div style={{fontSize: "20px" }}>🍔</div>
+
         </AdvancedMarker>
       ))}
     </>
