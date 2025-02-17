@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import './PlaceAutocomplete.css';
 
-const PlaceAutocomplete = ({selectedPlace, setSelectedPlace, tripStartLocation, setTripStartLocation ,tripEndLocation, setTripEndLocation }) => {
+const PlaceAutocomplete = ({ selectedPlace, setSelectedPlace, tripStartLocation, setTripStartLocation, tripEndLocation, setTripEndLocation }) => {
     const [placeAutocomplete, setPlaceAutocomplete] = useState(null);
 
     const inputRef = useRef(null);
@@ -24,7 +24,7 @@ const PlaceAutocomplete = ({selectedPlace, setSelectedPlace, tripStartLocation, 
 
     }, [places]);
 
-  
+
     useEffect(() => {
 
         if (!placeAutocomplete) return;
@@ -34,52 +34,56 @@ const PlaceAutocomplete = ({selectedPlace, setSelectedPlace, tripStartLocation, 
             setSelectedPlace(placeAutocomplete.getPlace());      //placeAutocomplete.getPlace()  gets the details of the selected place
             console.log(placeAutocomplete.getPlace().geometry.location.lat());
             console.log(placeAutocomplete.getPlace().geometry.location.lng());   // setSelectedPlace function sets these details to the  in the parent component <GoogleMaps>.jsx
-            
+
         });
     }, [setSelectedPlace, placeAutocomplete]);
 
 
     const handleButtonClick = () => {
-    if( tripStartLocation==null){
-        if (selectedPlace) {
-            setTripStartLocation(selectedPlace);
-            setSelectedPlace(selectedPlace);
-        
-        } else {
-            console.warn("No place selected");
+        if (tripStartLocation == null) {
+            if (selectedPlace) {
+                setTripStartLocation(selectedPlace);
+                setSelectedPlace(selectedPlace);
+
+            } else {
+                console.warn("No place selected");
+            }
         }
-    }
-    else{
-        if (selectedPlace) {
-            setTripEndLocation(selectedPlace);
-            setSelectedPlace(selectedPlace);
-           
-        } else {
-            console.warn("No place selected");
+        else {
+            if (selectedPlace) {
+                setTripEndLocation(selectedPlace);
+                setSelectedPlace(selectedPlace);
+
+            } else {
+                console.warn("No place selected");
+            }
         }
-    }
+        if (inputRef.current) {
+            inputRef.current.value = ""; // Clear the input field
+        }
     };
 
 
     useEffect(() => {
-        if(tripStartLocation && tripEndLocation){
+        if (tripStartLocation && tripEndLocation) {
             console.log("Trip Start Location Updated:", tripStartLocation);
             console.log("Trip End Location Updated:", tripEndLocation);
         }
-        else if( tripStartLocation){
+        else if (tripStartLocation) {
             console.log("Trip Start Location Updated:", tripStartLocation);
         }
-        
-        
+
+
     }, [tripStartLocation, tripEndLocation]);
 
-   
+
 
 
     return (
         <div className="autocomplete-container">
-            <input ref={inputRef} placeholder={tripStartLocation ? ("Enter End location ") : (" Enter Start Location")} />
-            <button className='setTripButton' onClick={handleButtonClick}> <h3>{tripStartLocation ? ("Set End location ") : (" Set Start Location")}</h3></button>
+            <input ref={inputRef} placeholder={(tripStartLocation && tripEndLocation) ? ("Start Navigation") : (tripStartLocation ? ("Set End location ") : (" Set Start Location"))} />
+            <button className='setTripButton' onClick={handleButtonClick}> <h3>{(tripStartLocation && tripEndLocation) ? ("Start Navigation") : (tripStartLocation ? ("Set End location ") : (" Set Start Location"))}</h3></button>
+            
         </div>
     );
 };

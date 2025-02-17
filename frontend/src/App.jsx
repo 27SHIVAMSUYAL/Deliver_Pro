@@ -1,6 +1,7 @@
 import React from "react";
 import NAVBAR from "./components/navbar";
 import GOMAPS from "./components/GOMAPS/GOMAPS";
+import Login from "./components/Pages/Login";
 import './App.css';
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         </div>
         <div className="gomapscontainer">
           <GOMAPS />
+        
 
         </div>
 
