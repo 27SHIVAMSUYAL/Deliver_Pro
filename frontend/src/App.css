@@ -1,11 +1,14 @@
 .appcontainer{
     height: 100vh;
     width: 100vw;
+    background: white;
 }
 
 .navbarcontainer{
     height: 20%;
     width: 100%;
+    background-color:white;
+
 }
 .gomapscontainer{
     height: 80%;

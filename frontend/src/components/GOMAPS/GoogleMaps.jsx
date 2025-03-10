@@ -26,6 +26,9 @@ const GoogleMaps = ({ location, setStartLocation, setEndLocation, startLocation,
 
 
 
+
+
+
   // when ever we select a place on the auto complete change the marker location to there
   useEffect(() => {
     if (selectedPlace && selectedPlace.geometry?.location) {
@@ -70,6 +73,40 @@ const GoogleMaps = ({ location, setStartLocation, setEndLocation, startLocation,
       setDirectionsRenderer(renderer);
     }
   }, [map]);
+
+
+
+
+  const circleRef = useRef(null);
+
+  useEffect(() => {
+    if (map) {
+      // Remove the previous circle if it exists
+      if (circleRef.current) {
+        circleRef.current.setMap(null);
+      }
+
+      // Create a new circle and store its reference
+      const newCircle = new google.maps.Circle({
+        strokeColor: "#FF0000",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: "#FF0000",
+        fillOpacity: 0.35,
+        map: map,
+        center: markerPosition,
+        radius: 5000,
+      });
+
+      circleRef.current = newCircle;
+
+      // Update map center and zoom level
+      map.setCenter(markerPosition);
+      map.setZoom(4);
+    }
+  }, [map, markerPosition]);
+
+
 
   const navigate = () => {
     if (!startLocation || !endLocation) {
@@ -148,7 +185,7 @@ const Markers = ({ points }) => {
       {points.map((point, index) => (
         <AdvancedMarker key={index} position={{ lat: point.lat, lng: point.lng }}>
 
-          <div style={{fontSize: "20px" }}>🍔</div>
+          <div style={{ fontSize: "20px" }}>🍔</div>
 
         </AdvancedMarker>
       ))}

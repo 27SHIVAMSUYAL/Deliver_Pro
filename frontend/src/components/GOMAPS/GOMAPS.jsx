@@ -158,37 +158,30 @@ const GOMAPS = () => {
             </div>
 
             {/* Reset Locations Button */}
-            <button 
-              style={{ marginTop: "10px", padding: "8px 12px", cursor: "pointer" }}
-              onClick={() => {
-                setStartLocation(null);
-                setEndLocation(null);
-              }}
-            >
-              Reset Locations
-            </button>
+
+           
 
           </div>
 
           <div className="actual-map">
-            <GoogleMaps 
-              location={location} 
+            <GoogleMaps
+              location={location}
               setStartLocation={(newLocation) => {
                 if (startLocation && endLocation) {
                   alert("Both locations are already set! Please reset before selecting new locations.");
                 } else if (!startLocation) {
                   setStartLocation(newLocation);
                 }
-              }} 
+              }}
               setEndLocation={(newLocation) => {
                 if (startLocation && endLocation) {
                   alert("Both locations are already set! Please reset before selecting new locations.");
                 } else if (!endLocation) {
                   setEndLocation(newLocation);
                 }
-              }} 
-              startLocation={startLocation} 
-              endLocation={endLocation} 
+              }}
+              startLocation={startLocation}
+              endLocation={endLocation}
             />
           </div>
         </APIProvider>

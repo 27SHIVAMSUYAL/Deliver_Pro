@@ -1,15 +1,16 @@
 const express = require("express");
 const connectDB = require("./config/db");
 require("dotenv").config();
-
+const cors = require("cors");
 const app = express();
-app.use(express.json());
 
+app.use(express.json()); 
+app.use(cors());
 // Connect to MongoDB
 connectDB();
 
 // Route Middleware
-app.use("/api/carrybuddy", require("./routes/carryBuddyRoutes"));
+app.use("/api/carrybuddy", require("./routes/carryBuddyRoutes")); // 
 app.use("/api/customers", require("./routes/customerRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/trips", require("./routes/tripRoutes"));

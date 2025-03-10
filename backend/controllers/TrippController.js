@@ -1,24 +1,32 @@
-const Trip = require("../models/Trip");
+const Parking = require("../models/Parking"); // Import the correct model
 
-exports.getTrips = async (req, res) => {
+exports.getParkingByLocation = async (req, res) => {
     try {
-        const trips = await Trip.find();
-        res.json(trips);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching trips", error });
-    }
-};
+        const { lat, lng } = req.body; // Latitude and Longitude for search location
 
-exports.getTripById = async (req, res) => {
-    try {
-        const trip = await Trip.findById(req.params.id);
-
-        if (!trip) {
-            return res.status(404).json({ message: "Trip not found" });
+        if (!lat || !lng) {
+            return res.status(400).json({ message: "Latitude and Longitude are required" });
         }
 
-        res.json(trip);
+        // Convert input latitude and longitude to a GeoJSON point
+        const userLocation = { type: 'Point', coordinates: [lng, lat] };
+
+        // Find parking locations where 'locationCoordinates' is within 2 km of the user location
+        const parkings = await Parking.find({
+            locationCoordinates: {
+                $near: {
+                    $geometry: userLocation,
+                    $maxDistance: 20000 // 20000 meters = 20 km
+                }
+            }
+        });
+
+        res.json(parkings);
     } catch (error) {
-        res.status(500).json({ message: "Error fetching trip", error });
+        console.error("Error fetching parking locations:", error);
+        res.status(500).json({ message: "Error fetching parking locations", error });
     }
 };
+
+
+

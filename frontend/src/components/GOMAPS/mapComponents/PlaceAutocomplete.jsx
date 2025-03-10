@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import './PlaceAutocomplete.css';
 
-const PlaceAutocomplete = ({ selectedPlace, setSelectedPlace, tripStartLocation, setTripStartLocation, tripEndLocation, setTripEndLocation }) => {
+const PlaceAutocomplete = ({ selectedPlace, setSelectedPlace, setMarkerPosition }) => {
     const [placeAutocomplete, setPlaceAutocomplete] = useState(null);
 
     const inputRef = useRef(null);
@@ -39,51 +39,36 @@ const PlaceAutocomplete = ({ selectedPlace, setSelectedPlace, tripStartLocation,
     }, [setSelectedPlace, placeAutocomplete]);
 
 
+
+
     const handleButtonClick = () => {
-        if (tripStartLocation == null) {
-            if (selectedPlace) {
-                setTripStartLocation(selectedPlace);
-                setSelectedPlace(selectedPlace);
 
-            } else {
-                console.warn("No place selected");
-            }
+        ///////////set marker position by auto complete
+        if (selectedPlace && selectedPlace.geometry) {
+            const newPosition = {
+                lat: selectedPlace.geometry.location.lat(),
+                lng: selectedPlace.geometry.location.lng()
+            };
+            setMarkerPosition(newPosition); // Move marker and map to the new position
         }
-        else {
-            if (selectedPlace) {
-                setTripEndLocation(selectedPlace);
-                setSelectedPlace(selectedPlace);
+        /////////////////////////////////////////////////////////////////////////
 
-            } else {
-                console.warn("No place selected");
-            }
-        }
         if (inputRef.current) {
             inputRef.current.value = ""; // Clear the input field
         }
     };
 
 
-    useEffect(() => {
-        if (tripStartLocation && tripEndLocation) {
-            console.log("Trip Start Location Updated:", tripStartLocation);
-            console.log("Trip End Location Updated:", tripEndLocation);
-        }
-        else if (tripStartLocation) {
-            console.log("Trip Start Location Updated:", tripStartLocation);
-        }
-
-
-    }, [tripStartLocation, tripEndLocation]);
+   
 
 
 
 
     return (
         <div className="autocomplete-container">
-            <input ref={inputRef} placeholder={(tripStartLocation && tripEndLocation) ? ("Start Navigation") : (tripStartLocation ? ("Set End location ") : (" Set Start Location"))} />
-            <button className='setTripButton' onClick={handleButtonClick}> <h3>{(tripStartLocation && tripEndLocation) ? ("Start Navigation") : (tripStartLocation ? ("Set End location ") : (" Set Start Location"))}</h3></button>
-            
+            <input ref={inputRef} placeholder={(" Search a Location")} />
+            <button className='setTripButton' onClick={handleButtonClick}> <h3>{("Set Location")}</h3></button>
+
         </div>
     );
 };
