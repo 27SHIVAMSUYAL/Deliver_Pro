@@ -30,6 +30,8 @@ const parkingSchema = new mongoose.Schema({
     openTime: { type: String, required: true },
     closeTime: { type: String, required: true },
     pricePerHr: { type: Number, required: true },
+    vehicleCount: { type: Number, required: true },
+    vehicleCurrent: { type: Number, required: true },
 
     status: { type: String, enum: ['active', 'closed', 'full'], default: 'active' },
     createdAt: { type: Date, default: Date.now }

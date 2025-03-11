@@ -10,6 +10,7 @@ import Post from "./components/Pages/Post";
 import "./App.css";
 import NAVBAR from "./components/NAVBAR";
 import Dashboard from "./components/Pages/Dashboard";
+import Bookings from "./components/Pages/Bookings";
 
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
                         <Route path="/test" element={<GMAPS />} />
                         <Route path="/post" element={<Post />} />
                         <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/bookings/:id" element={<Bookings />} /> {/* ✅ Add Route */}
                     </Routes>
                 </APIProvider>
             </div>

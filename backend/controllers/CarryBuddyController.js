@@ -77,10 +77,7 @@ exports.signUp = async (req, res) => {
 };
 
 
-
-
 const multer = require("multer");
-
 
 // 🔹 Setup Multer for memory storage (stores images as buffers)
 const storage = multer.memoryStorage();
@@ -104,8 +101,8 @@ exports.postParking = async (req, res) => {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const { userId, name, phone } = decoded;
 
-            // 🔹 Extract form data from request
-            const { location, openTime, closeTime, pricePerHr, locationCoordinates } = req.body;
+            // 🔹 Extract form data from request (Added vehicleCount & vehicleCurrent)
+            const { location, openTime, closeTime, pricePerHr, locationCoordinates, vehicleCount, vehicleCurrent } = req.body;
             
             // 🔹 Parse locationCoordinates safely
             let parsedCoordinates;
@@ -138,7 +135,7 @@ exports.postParking = async (req, res) => {
                 return res.status(409).json({ message: "A parking spot already exists at this location!" });
             }
 
-            // 🔹 Prepare new parking entry
+            // 🔹 Prepare new parking entry (Added vehicleCount & vehicleCurrent)
             const newParking = new Parking({
                 userId,
                 name,
@@ -150,7 +147,9 @@ exports.postParking = async (req, res) => {
                 },
                 openTime,
                 closeTime,
-                pricePerHr
+                pricePerHr,
+                vehicleCount,      // 🔹 New field added
+                vehicleCurrent     // 🔹 New field added
             });
 
             // 🔹 Handle image upload (if provided)
@@ -168,6 +167,7 @@ exports.postParking = async (req, res) => {
         }
     });
 };
+
 
 /* Summary:
 

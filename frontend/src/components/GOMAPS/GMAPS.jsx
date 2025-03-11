@@ -13,9 +13,12 @@ import React, { useEffect, useState, useRef } from "react";
 import "./GoogleMaps.css";
 import points from "./data/points";
 import PlaceAutocomplete from "./mapComponents/PlaceAutocomplete";
+import { useNavigate } from "react-router-dom";
+
 
 const GMAPS = () => {
   const GoogleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const navigate = useNavigate();
 
   const [location, setLocation] = useState({ latitude: 19.0760, longitude: 72.8777 });
   const [slider, setSlider] = useState(2500);
@@ -29,7 +32,7 @@ const GMAPS = () => {
   // Function to fetch nearby parking spots
   const fetchParkingSpots = async (lat, lng) => {
     try {
-      const url = "http://localhost:5000/api/trips/trips"; // POST request URL
+      const url = "http://localhost:5000/api/trips/parking"; // POST request URL
       console.log("Sending request to:", url);
 
       const response = await fetch(url, {
@@ -46,12 +49,14 @@ const GMAPS = () => {
 
       const data = await response.json();
       console.log("Received Data:", data);
-      setParkingSpots(data); // Assuming you have a state setter function
+
+      // Filter out only 'active' and 'full' status
+      setParkingSpots(data.filter(spot => spot.status === "active" || spot.status === "full"));
+
     } catch (error) {
       console.error("Error fetching parking spots:", error);
     }
   };
-
 
   // When marker position changes, fetch parking spots
   useEffect(() => {
@@ -83,6 +88,11 @@ const GMAPS = () => {
     map.setZoom(12.5);
   }, [map, markerPosition, slider]);
 
+  const [hoveredSpot, setHoveredSpot] = useState(null);
+  const handleMarkerClick = (parking) => {
+    navigate(`/bookings/${parking._id}`, { state: { parking } }); // ✅ Pass parking data
+  };
+
   return (
     <div className="map-container">
       <div className="maps-div">
@@ -109,14 +119,14 @@ const GMAPS = () => {
             step="500"
           />
 
-          <div class="flex justify-between px-2.5 mt-2 text-xs">
+          <div className="flex justify-between px-2.5 mt-2 text-xs">
             <span>|</span>
             <span>|</span>
             <span>|</span>
             <span>|</span>
             <span>|</span>
           </div>
-          <div class="flex justify-between px-2.5 mt-2 text-xs">
+          <div className="flex justify-between px-2.5 mt-2 text-xs">
             <span>0.5</span>
             <span>1</span>
             <span>1.5</span>
@@ -132,13 +142,51 @@ const GMAPS = () => {
 
             {/* Parking Spot Markers */}
             {parkingSpots.map((spot, index) => (
-              <AdvancedMarker key={index} position={{
-                lat: spot.locationCoordinates.coordinates[1],
-                lng: spot.locationCoordinates.coordinates[0]
-              }}>
-                <div style={{ fontSize: "50px" }}>🚗</div>
+              <AdvancedMarker
+                key={index}
+                position={{
+                  lat: spot.locationCoordinates.coordinates[1],
+                  lng: spot.locationCoordinates.coordinates[0]
+                }}
+                onClick={() => handleMarkerClick(spot)} // 🔹 Navigate on click
+              >
+                <div
+                  style={{ position: "relative", cursor: "pointer" }}
+                  onMouseEnter={() => setHoveredSpot(spot._id)}
+                  onMouseLeave={() => setHoveredSpot(null)}
+                >
+                  <img
+                    src={`/${spot.status}.png`}
+                    alt={spot.status}
+                    style={{ width: "40px", height: "40px" }}
+                  />
+
+                  {/* Show info card on hover */}
+                  {hoveredSpot === spot._id && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: "50px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        background: "white",
+                        padding: "8px",
+                        borderRadius: "8px",
+                        boxShadow: "0px 0px 10px rgba(0,0,0,0.2)",
+                        zIndex: 10,
+                        width: "150px",
+                        textAlign: "center"
+                      }}
+                    >
+                      <strong>{spot.name}</strong><br />
+                      {spot.location} <br />
+                      ₹{spot.pricePerHr}/hr
+                    </div>
+                  )}
+                </div>
               </AdvancedMarker>
             ))}
+
           </Map>
 
           <MapControl position={ControlPosition.TOP}>

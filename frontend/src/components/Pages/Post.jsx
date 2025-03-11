@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 function Post() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
-    const [error, setError] = useState("");
+    const [error, setError] = useState(""); // Corrected useState
+
 
     const [formData, setFormData] = useState({
         address: "",
@@ -14,6 +15,8 @@ function Post() {
         latitude: "",
         longitude: "",
         image: null,
+        vehicleCount: "",
+        vehicleCurrent: "0", // Default to 0 since no vehicles are present initially
     });
 
     useEffect(() => {
@@ -83,9 +86,21 @@ function Post() {
 
         const latitude = parseFloat(formData.latitude);
         const longitude = parseFloat(formData.longitude);
+        const vehicleCount = parseInt(formData.vehicleCount);
+        const vehicleCurrent = parseInt(formData.vehicleCurrent);
 
         if (isNaN(latitude) || isNaN(longitude)) {
             setError("Invalid latitude or longitude values.");
+            return;
+        }
+
+        if (isNaN(vehicleCount) || vehicleCount < 0) {
+            setError("Invalid vehicle count.");
+            return;
+        }
+
+        if (isNaN(vehicleCurrent) || vehicleCurrent < 0 || vehicleCurrent > vehicleCount) {
+            setError("Invalid vehicle current value.");
             return;
         }
 
@@ -102,6 +117,8 @@ function Post() {
         formDataToSend.append("openTime", formData.openTime);
         formDataToSend.append("closeTime", formData.closeTime);
         formDataToSend.append("pricePerHr", formData.pricePerHour);
+        formDataToSend.append("vehicleCount", vehicleCount);
+        formDataToSend.append("vehicleCurrent", vehicleCurrent);
         formDataToSend.append("locationCoordinates", JSON.stringify({
             type: "Point",
             coordinates: [longitude, latitude]
@@ -124,7 +141,7 @@ function Post() {
 
             if (response.ok) {
                 alert("Parking added successfully!");
-                console.log( formData);
+                console.log(formData);
                 console.log("Parking added successfully!");
                 setFormData({
                     address: "",
@@ -134,6 +151,8 @@ function Post() {
                     latitude: "",
                     longitude: "",
                     image: null,
+                    vehicleCount: "",
+                    vehicleCurrent: "0",
                 });
             } else {
                 setError(data.message || "Failed to add parking.");
@@ -181,7 +200,9 @@ function Post() {
                     <input className="w-full p-2 border rounded" name="closeTime" type="time" value={formData.closeTime} onChange={handleChange} required />
                     <input className="w-full p-2 border rounded" name="pricePerHour" type="number" placeholder="Price per Hour ₹₹" min={0} value={formData.pricePerHour} onChange={handleChange} required />
                     <input className="w-full p-2 border rounded" name="latitude" type="text" placeholder="Latitude" value={formData.latitude} onChange={handleChange} required />
-                    <input className="w-full p-2 border rounded mt-2" name="longitude" type="text" placeholder="Longitude" value={formData.longitude} onChange={handleChange} required />
+                    <input className="w-full p-2 border rounded" name="longitude" type="text" placeholder="Longitude" value={formData.longitude} onChange={handleChange} required />
+                    <input className="w-full p-2 border rounded" name="vehicleCount" type="number" placeholder="Total Vehicle Capacity" min={0} value={formData.vehicleCount} onChange={handleChange} required />
+                    <input className="w-full p-2 border rounded" name="vehicleCurrent" type="number" placeholder="Current Vehicles Present" min={0} value={formData.vehicleCurrent} onChange={handleChange} required />
                     <button type="button" onClick={handleGetCurrentLocation} className="bg-green-500 text-white p-2 rounded mt-2">Get Current Location</button>
                     {error && <p className="text-red-500 text-sm">{error}</p>}
                     <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">Submit Form</button>
